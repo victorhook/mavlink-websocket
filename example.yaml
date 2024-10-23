@@ -1,0 +1,61 @@
+target_system_id: 1
+target_component_id: 0
+port: 14550
+stream_frequency_hz: 10
+
+data:
+  # Keys are the MAVLINK message name and the values are
+  # a list of fields in the message
+  # See: https://mavlink.io/en/messages/ardupilotmega.html
+  ATTITUDE:
+    rate: 10
+    fields:
+      - roll
+      - pitch
+      - yaw
+      - rollspeed
+      - pitchspeed
+      - yawspeed
+  GPS_RAW_INT:
+    rate: 10
+    fields:
+      - lat
+      - lon
+      - alt
+      - eph
+      - epv
+      - satellites_visible
+  VIBRATION:
+    rate: 10
+    fields:
+      - vibration_x
+      - vibration_y
+      - vibration_z
+      - clipping_0
+      - clipping_1
+      - clipping_2
+  HOME_POSITION:
+    rate: 10
+    fields:
+      - latitude
+      - longitude
+      - altitude
+  RC_CHANNELS_SCALED:
+    rate: 10
+    fields:
+      - chan1_scaled
+      - chan2_scaled
+      - chan3_scaled
+      - chan4_scaled
+      - chan5_scaled
+      - chan6_scaled
+      - chan7_scaled
+      - chan8_scaled
+  POSITION_TARGET_LOCAL_NED:
+    rate: 10
+    fields:
+      - vx
+      - vy
+      - vz
+      - yaw
+      - yaw_rate
