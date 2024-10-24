@@ -8,6 +8,7 @@ import Battery from './Battery/Battery';
 import Graph from './Graph/Graph';
 import KeyValue from './KeyValue/KeyValue';
 import TelemetryClient from './TelemetryClient';
+import TelemetryTable from './Telemetry/Telemetry';
 
 
 function App() {
@@ -64,10 +65,7 @@ function App() {
 
       <KeyValue name={'test'} value={22} />
 
-      <div>
-        <h1>Telemetry Data</h1>
-        <pre>{JSON.stringify(telemetryData, null, 2)}</pre>
-      </div>
+      <TelemetryTable telemetryData={telemetryData} />
     </div>
   );
 }

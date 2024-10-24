@@ -8,6 +8,20 @@ data:
   # Keys are the MAVLINK message name and the values are
   # a list of fields in the message
   # See: https://mavlink.io/en/messages/ardupilotmega.html
+  SYS_STATUS:
+    rate: 10
+    fields:
+      - voltage_battery
+      - current_battery
+      - battery_remaining
+      - onboard_control_sensors_present
+      - onboard_control_sensors_enabled
+      - onboard_control_sensors_health
+  SYSTEM_TIME:
+    rate: 10
+    fields:
+      - time_unix_usec
+      - time_boot_ms
   ATTITUDE:
     rate: 10
     fields:
@@ -60,3 +74,4 @@ data:
       - vz
       - yaw
       - yaw_rate
+      
