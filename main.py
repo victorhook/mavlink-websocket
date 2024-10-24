@@ -1,10 +1,11 @@
 from pymavlink import mavutil
 from pymavlink.dialects.v20 import ardupilotmega
 from pymavlink.dialects.v20.ardupilotmega import *
+import json
 import yaml
 from dataclasses import dataclass
 from typing import Dict, List
-
+from threading import Thread
 
 
 @dataclass
@@ -18,9 +19,17 @@ class Config:
 
 class MavlinkMessageHandler:
 
-    def __init__(self, msg_name: str, desired_fields: List[str]) -> None:
+    def __init__(self, msg_name: str, rate_hz: int, desired_fields: List[str]) -> None:
         self.msg_name = msg_name
+        self.rate_hz = rate_hz
+        # Fetch the message ID from `ardupilotmega` python module
         self.msg_id = getattr(ardupilotmega, f'MAVLINK_MSG_ID_{msg_name}')
+        
+        # Wildcard field means we will listen to all.
+        if '*' in desired_fields:
+            # Let's get them from the python message class
+            desired_fields = mavlink_map.get(self.msg_id).fieldnames
+
         self.fields = {field: 0.0 for field in desired_fields}
 
     def handle_message(self, msg: MAVLink_message) -> None:
@@ -36,7 +45,15 @@ class MavlinkServer:
         self.config = config
         self.system_id = 250
         self.component_id = MAV_COMP_ID_USER1
-        self.msg_handlers = dict()
+        self.msg_handlers: Dict[int, MavlinkMessageHandler] = dict()
+
+        # Construct MAVlink message handlers, based on the config file
+        for mavlink_msg, attrs in self.config.data.items():
+            rate = int(attrs.get('rate', 10))
+            desired_fields = attrs.get('fields')
+            msg_handler = MavlinkMessageHandler(mavlink_msg, rate, desired_fields)
+            self.msg_handlers[msg_handler.msg_id] = msg_handler
+
 
     def start(self) -> None:
         print(f'Listening to UDP port {self.config.port}')
@@ -56,23 +73,16 @@ class MavlinkServer:
 
         # Let's build requests for data streams
         print('Requesting data streams')
-        for mavlink_msg, attrs in self.config.data.items():
-            rate = int(attrs.get('rate', 10))
-            desired_fields = attrs.get('fields')
-
-            msg_handler = MavlinkMessageHandler(mavlink_msg, desired_fields)
-            self.msg_handlers[msg_handler.msg_id] = msg_handler
-            print(f'  {mavlink_msg} at {rate} hz')
-            self._request_data_streams(msg_handler.msg_id, rate)
+        for handler in self.msg_handlers.values():
+            print(f'  {handler.msg_name} at {handler.rate_hz} hz')
+            self._request_data_streams(handler.msg_id, handler.rate_hz)
 
         def go():
-            import json
             while True:
                 print(json.dumps(self.telemetry(), indent=4))
                 time.sleep(1)
 
 
-        from threading import Thread
         Thread(target=go, daemon=True).start()
 
         # Main loop to listen for specific MAVLink messages
@@ -116,6 +126,7 @@ if __name__ == '__main__':
     with open('./example.yaml', 'r') as file:
         config_dict = yaml.safe_load(file)
         config = Config(**config_dict)
+
 
     server = MavlinkServer(config)
     server.start()
