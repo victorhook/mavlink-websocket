@@ -1,0 +1,18 @@
+.horizon {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(to top, #7ec0ee, #006994); /* Sky */
+    border: 2px solid black;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .horizon-line {
+    width: 200px;
+    height: 300px;
+    border-top: 5px solid white; /* Horizon line */
+    position: absolute;
+    top: 50%;
+    transform-origin: center;
+  }
+  
