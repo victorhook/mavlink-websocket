@@ -1,6 +1,7 @@
 target_system_id: 1
 target_component_id: 0
-port: 14550
+mavlink_port: 14550
+telemetry_port: 8989
 stream_frequency_hz: 10
 
 data:

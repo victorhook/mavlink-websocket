@@ -7,12 +7,15 @@ from dataclasses import dataclass
 from typing import Dict, List
 from threading import Thread
 
+from telemetry_server import TelemetryServer
+
 
 @dataclass
 class Config:
     target_system_id: int
     target_component_id: int
-    port: int
+    mavlink_port: int
+    telemetry_port: int
     stream_frequency_hz: int
     data: Dict[str, dict]
 
@@ -54,11 +57,15 @@ class MavlinkServer:
             msg_handler = MavlinkMessageHandler(mavlink_msg, rate, desired_fields)
             self.msg_handlers[msg_handler.msg_id] = msg_handler
 
+        self.telemetry_server = TelemetryServer(port=self.config.telemetry_port)
 
     def start(self) -> None:
-        print(f'Listening to UDP port {self.config.port}')
+        # Start the telemetry server
+        Thread(target=self.telemetry_server.start, name='Telemetry Server', daemon=True).start()
+
+        print(f'Listening to UDP port {self.config.mavlink_port}')
         self._con = mavutil.mavlink_connection(
-            f'udp:127.0.0.1:{self.config.port}',
+            f'udp:127.0.0.1:{self.config.mavlink_port}',
             source_system=self.system_id,
             source_component=self.component_id
         )
@@ -79,8 +86,8 @@ class MavlinkServer:
 
         def go():
             while True:
-                print(json.dumps(self.telemetry(), indent=4))
-                time.sleep(1)
+                self.telemetry_server.set_telemetry(self.telemetry())
+                time.sleep(0.1)
 
 
         Thread(target=go, daemon=True).start()
