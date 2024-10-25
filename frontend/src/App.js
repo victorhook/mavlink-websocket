@@ -9,6 +9,7 @@ import Graph from './Graph/Graph';
 import KeyValue from './KeyValue/KeyValue';
 import TelemetryClient from './TelemetryClient';
 import TelemetryTable from './Telemetry/Telemetry';
+import Clock from './Clock/Clock';
 
 
 function App() {
@@ -58,7 +59,12 @@ function App() {
 
   return (
     <div className="App">
-      {/*<DroneMap dronePosition={droneData} />*/}
+      <h1>E3 hub</h1>
+      <hr />
+      <Clock />
+      <hr />
+      <p>More really cool stuff coming soon... 🚀</p>
+      {/*<DroneMap dronePosition={droneData} />
       <Horizon pitch={droneData.pitch} roll={droneData.roll} />
       <Battery percentage={droneData.battery} />
       <Graph data={altitudeData} />
@@ -66,6 +72,7 @@ function App() {
       <KeyValue name={'test'} value={22} />
 
       <TelemetryTable telemetryData={telemetryData} />
+      */}
     </div>
   );
 }
